@@ -13,52 +13,30 @@
 
       <div class="form-control">
         <label for="value">Значение</label>
-        <textarea id="value" v-model="text" rows="3"></textarea>
+        <textarea id="value" v-model.trim="blockText" rows="3"></textarea>
       </div>
 
-      <button class="btn primary" :disabled="text.length <= 3">Добавить</button>
+      <button class="btn primary" :disabled="disabledBtn">Добавить</button>
     </form>
-
     <div class="card card-w70">
-      <app-title
-        v-for="block in blocks"
-        :key="block"
-        :title="block"
-      >
-      </app-title>
-      <app-subtitle
-        v-for="block in blocks"
-        :key="block"
-        :title="block"
-      >
-      </app-subtitle>
-      <h1>Резюме Nickname</h1>
-      <div class="avatar">
-        <img src="https://cdn.dribbble.com/users/5592443/screenshots/14279501/drbl_pop_r_m_rick_4x.png">
+      <div v-if="items.length">
+          <component v-for="item in items"
+                     :key="item"
+                     :is="item.block"
+                     :text="item.content">
+          </component>
       </div>
-      <h2>Опыт работы</h2>
-      <p>
-        главный герой американского мультсериала «Рик и Морти», гениальный учёный, изобретатель, атеист (хотя в некоторых сериях он даже молится Богу, однако, каждый раз после чудесного спасения ссылается на удачу и вновь отвергает его существование), алкоголик, социопат, дедушка Морти. На момент начала третьего сезона ему 70 лет[1]. Рик боится пиратов, а его главной слабостью является некий - "Санчезиум". Исходя из того, что существует неограниченное количество вселенных, существует неограниченное количество Риков, герой сериала предположительно принадлежит к измерению С-137. В серии комикcов Рик относится к измерению C-132, а в игре «Pocket Mortys» — к измерению C-123[2]. Прототипом Рика Санчеза является Эмметт Браун, герой кинотрилогии «Назад в будущее»[3].
-      </p>
-      <h3>Добавьте первый блок, чтобы увидеть результат</h3>
+      <div v-else>
+        <h3>Добавьте первый блок, чтобы увидеть результат</h3>
+      </div>
     </div>
   </div>
   <div class="container">
-    <p>
-      <button class="btn primary">Загрузить комментарии</button>
-    </p>
-    <div class="card">
-      <h2>Комментарии</h2>
-      <ul class="list">
-        <li class="list-item">
-          <div>
-            <p><strong>test@microsoft.com</strong></p>
-            <small>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eligendi, reiciendis.</small>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="loader"></div>
+    <app-comments-list v-if="!loading"
+      :comments="commentsList"
+      @load="loadComments"
+    ></app-comments-list>
+    <app-loader v-else></app-loader>
   </div>
 </template>
 
@@ -66,45 +44,75 @@
 import axios from 'axios'
 import AppTitle from '@/AppTitle'
 import AppSubtitle from '@/AppSubtitle'
+import AppAvatar from '@/AppAvatar'
+import AppText from '@/AppText'
+import AppCommentsList from '@/AppCommentsList'
+import AppLoader from './AppLoader'
+
 export default {
+  components: {
+    AppTitle, AppSubtitle, AppAvatar, AppText, AppCommentsList, AppLoader
+  },
   data () {
     return {
-      text: '',
+      blockText: '',
       blockType: 'title',
-      blocks: []
+      items: [],
+      commentsList: [],
+      loading: false
     }
   },
-  components: {
-    AppTitle, AppSubtitle
+  computed: {
+    tagNeme () {
+      return 'app-' + this.blockType
+    },
+    disabledBtn () {
+      return this.blockText.length <= 3
+    }
   },
   methods: {
     async createBlock () {
-      console.log(this.blockType, this.text)
-      const response = await axios.post('https://vue-resume-e0e35-default-rtdb.firebaseio.com/blocks.json',
-        { blockText: this.text })
+      console.log(this.blockType, this.blockText)
+      const response = await axios.post('https://vue-resume2-default-rtdb.firebaseio.com/blocks.json',
+        {
+          dataBlockType: this.blockType,
+          dataBlockText: this.blockText
+        })
 
       const { data } = await response
 
-      console.log(data.name.title)
+      console.log(data.name)
 
-      this.blocks.push({
-        title: this.text
+      this.items.push({
+        block: 'app-' + this.blockType,
+        content: this.blockText
       })
-      this.text = ''
+      console.log(this.items)
+      this.blockText = ''
+    },
+    async loadComments () {
+      try {
+        this.loading = true
+        const { data } = await axios.get('https://jsonplaceholder.typicode.com/comments?_limit=42')
+        if (!data) {
+          this.loading = false
+          throw new Error('Список комментариев пуст')
+        }
+        this.commentsList = Object.keys(data).map(key => {
+          return {
+            id: key,
+            ...data[key]
+          }
+        })
+        this.loading = false
+      } catch (e) {
+        e.message()
+      }
     }
   }
 }
 </script>
 
 <style>
-  .avatar {
-    display: flex;
-    justify-content: center;
-  }
 
-  .avatar img {
-    width: 150px;
-    height: auto;
-    border-radius: 50%;
-  }
 </style>

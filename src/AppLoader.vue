@@ -1,14 +1,10 @@
 <template>
-  <h1 class="red">
-    {{ text }}
-  </h1>
+  <div class="loader"></div>
 </template>
 
 <script>
 export default {
-  props: {
-    text: String
-  }
+
 }
 </script>
 

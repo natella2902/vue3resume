@@ -1,7 +1,7 @@
 <template>
-  <h1 class="red">
-    {{ text }}
-  </h1>
+  <p>
+   {{ text }}
+  </p>
 </template>
 
 <script>
