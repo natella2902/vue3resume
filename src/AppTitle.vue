@@ -7,7 +7,13 @@
 <script>
 export default {
   props: {
-    text: String
+    text: {
+      type: String,
+      required: true,
+      validator (value) {
+        return typeof value === 'string'
+      }
+    }
   }
 }
 </script>

@@ -7,7 +7,13 @@
 <script>
 export default {
   props: {
-    text: String
+    text: {
+      type: String,
+      required: true,
+      validator (value) {
+        return typeof value === 'string'
+      }
+    }
   }
 }
 </script>
@@ -21,8 +27,9 @@ export default {
 
 .avatar img {
   width: 150px;
-  height: auto;
+  height: 150px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 </style>

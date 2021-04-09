@@ -1,9 +1,6 @@
 <template>
   <p v-if="!comments.length">
-    <button
-      class="btn primary"
-      @click="$emit('load')"
-    >Загрузить комментарии</button>
+    <app-btn @load="$emit('load')">Nene</app-btn>
   </p>
   <div class="card" v-else>
     <h2>Комментарии</h2>
@@ -19,10 +16,22 @@
 </template>
 
 <script>
+import AppBtn from '@/AppBtn'
 export default {
-  emits: ['load'],
+  components: { AppBtn },
+  emits: {
+    load: null
+  },
   props: {
-    comments: Array
+    comments: {
+      type: Array,
+      required: false
+    }
+  },
+  methods: {
+    loadList () {
+      console.log('click')
+    }
   }
 }
 </script>

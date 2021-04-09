@@ -21,7 +21,7 @@
     <div class="card card-w70">
       <div v-if="items.length">
           <component v-for="item in items"
-                     :key="item"
+                     :key="item.id"
                      :is="item.block"
                      :text="item.content">
           </component>
@@ -62,33 +62,46 @@ export default {
       loading: false
     }
   },
+  mounted () {
+    this.loadBlocks()
+  },
   computed: {
-    tagNeme () {
-      return 'app-' + this.blockType
-    },
     disabledBtn () {
       return this.blockText.length <= 3
     }
   },
   methods: {
     async createBlock () {
-      console.log(this.blockType, this.blockText)
       const response = await axios.post('https://vue-resume2-default-rtdb.firebaseio.com/blocks.json',
         {
           dataBlockType: this.blockType,
           dataBlockText: this.blockText
         })
-
       const { data } = await response
-
-      console.log(data.name)
-
       this.items.push({
+        id: data.name,
         block: 'app-' + this.blockType,
         content: this.blockText
       })
-      console.log(this.items)
       this.blockText = ''
+      this.blockType = 'title'
+    },
+    async loadBlocks () {
+      try {
+        const { data } = await axios.get('https://vue-resume2-default-rtdb.firebaseio.com/blocks.json')
+        if (!data) {
+          throw new Error('Записей нет')
+        }
+        this.items = Object.keys(data).map(key => {
+          return {
+            id: key,
+            content: data[key].dataBlockText,
+            block: 'app-' + data[key].dataBlockType
+          }
+        })
+      } catch (e) {
+        e.message()
+      }
     },
     async loadComments () {
       try {
