@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import AppBtn from '@/AppBtn'
+import AppBtn from './AppBtn'
 export default {
   components: { AppBtn },
   emits: {

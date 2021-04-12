@@ -1,21 +1,11 @@
 <template>
   <div class="avatar">
-    <img :src="text">
+    <img :src="$attrs.value">
   </div>
 </template>
 
 <script>
-export default {
-  props: {
-    text: {
-      type: String,
-      required: true,
-      validator (value) {
-        return typeof value === 'string'
-      }
-    }
-  }
-}
+
 </script>
 
 <style scoped>
