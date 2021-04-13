@@ -1,27 +1,27 @@
 <template>
   <div class="container column">
-    <app-form @block-added="createBlock"></app-form>
-    <app-resume :blocks="items"></app-resume>
+    <resume-form @block-added="createBlock"></resume-form>
+    <resume-view :blocks="items"></resume-view>
   </div>
   <div class="container">
-    <app-comments-list v-if="!loading"
+    <resume-comments v-if="!loading"
       :comments="commentsList"
       @load="loadComments"
-    ></app-comments-list>
+    ></resume-comments>
     <app-loader v-else></app-loader>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import AppForm from './components/AppForm'
-import AppResume from './components/AppResume'
-import AppCommentsList from './components/AppCommentsList'
+import ResumeForm from './components/ResumeForm'
+import ResumeView from './components/ResumeView'
+import ResumeComments from './components/ResumeComments'
 import AppLoader from './components/AppLoader'
 
 export default {
   components: {
-    AppCommentsList, AppLoader, AppForm, AppResume
+    ResumeComments, AppLoader, ResumeForm, ResumeView
   },
   mounted () {
     this.loadBlocks()
